@@ -1,3 +1,4 @@
+import datetime
 from os import truncate
 
 import discord
@@ -104,3 +105,4 @@ class ProxyMessage:
         self.content = content
         self.attachments = []
         self.stickers = []
+        self.created_at = datetime.datetime.now()
