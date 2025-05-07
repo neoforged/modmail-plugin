@@ -91,6 +91,7 @@ class NeoPlugin(commands.Cog):
             await thread.reply(message={
                 'channel': interaction.channel,
                 'content': message,
+                'author': interaction.user,
                 'attachments': [],
                 'stickers': []
             }, anonymous=True, plain=False)
