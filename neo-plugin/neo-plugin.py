@@ -5,7 +5,7 @@ from discord import app_commands, TextStyle, AppCommandType, Permissions
 from discord.ext import commands
 
 from bot import ModmailBot
-from core.models import InvalidConfigError
+from core.models import InvalidConfigError, DummyMessage
 from core.thread import Thread
 
 
@@ -88,13 +88,11 @@ class NeoPlugin(commands.Cog):
     async def areply(self, interaction: discord.Interaction, message: str) -> None:
         thread = await self.bot.threads.find(channel=interaction.channel)
         if thread is not None:
-            await thread.reply(message={
+            await thread.reply(message=DummyMessage({
                 'channel': interaction.channel,
                 'content': message,
-                'author': interaction.user,
-                'attachments': [],
-                'stickers': []
-            }, anonymous=True, plain=False)
+                'author': interaction.user
+            }), anonymous=True, plain=False)
             await interaction.response.send_message('Message sent!')
         else:
             await interaction.response.send_message('You cannot use this command in this channel', ephemeral=True)
