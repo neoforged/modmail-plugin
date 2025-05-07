@@ -10,7 +10,7 @@ from core.thread import Thread
 
 
 class NeoPlugin(commands.Cog):
-    config_group = app_commands.Group(name = "config", description="Config commands", default_permissions=Permissions(moderate_members=True))
+    config_group = app_commands.Group(name = "config", description="Config commands", default_permissions=Permissions(moderate_members=True), guild_only=True)
 
     def __init__(self, bot: ModmailBot):
         self.bot = bot
