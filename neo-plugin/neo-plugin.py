@@ -88,13 +88,7 @@ class NeoPlugin(commands.Cog):
     async def areply(self, interaction: discord.Interaction, message: str) -> None:
         thread = await self.bot.threads.find(channel=interaction.channel)
         if thread is not None:
-            await thread.reply(message=DummyMessage(message={
-                "channel": interaction.channel,
-                "content": message,
-                "author": interaction.user,
-                "attachments": [],
-                "stickers": []
-            }), anonymous=True, plain=False)
+            await thread.reply(DummyMessage(ProxyMessage(interaction.channel, interaction.user, message)), anonymous=True, plain=False)
             await interaction.response.send_message('Message sent!')
         else:
             await interaction.response.send_message('You cannot use this command in this channel', ephemeral=True)
@@ -102,3 +96,11 @@ class NeoPlugin(commands.Cog):
 async def setup(bot: ModmailBot):
     await bot.add_cog(NeoPlugin(bot))
     await bot.tree.sync()
+
+class ProxyMessage:
+    def __init__(self, channel, author, content):
+        self.channel = channel
+        self.author = author
+        self.content = content
+        self.attachments = []
+        self.stickers = []
