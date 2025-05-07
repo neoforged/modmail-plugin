@@ -67,6 +67,9 @@ class NeoPlugin(commands.Cog):
 
             async def on_submit(self, int: discord.Interaction):
                 thread = await self.bot.threads.find_or_create(interaction.user)
+                if not thread.ready:
+                    await thread.wait_until_ready()
+
                 embed = discord.Embed(
                     title="Received report from user",
                     description=self.reason.value
