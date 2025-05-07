@@ -106,3 +106,4 @@ class ProxyMessage:
         self.attachments = []
         self.stickers = []
         self.created_at = datetime.datetime.now()
+        self.id = 0
