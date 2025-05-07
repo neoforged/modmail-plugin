@@ -4,16 +4,19 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from bot import ModmailBot
+from core.models import InvalidConfigError
+
 class NeoPlugin(commands.Cog):
     config_group = app_commands.Group(name = "config", description="Config commands")
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: ModmailBot):
         self.bot = bot
 
     async def config_option_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        keys = self.bot.config.public_keys
+        keys = sorted(self.bot.config.public_keys)
         return [app_commands.Choice(name=option, value=option) for option in keys if
-                option.lower().startswith(current.lower())].sort(key=lambda a : a.value)[:25]
+                option.lower().startswith(current.lower())][:25]
 
     @app_commands.guild_only()
     @app_commands.describe(key="The config key", value="The config value")
@@ -24,13 +27,16 @@ class NeoPlugin(commands.Cog):
         keys = self.bot.config.public_keys
 
         if key in keys:
-            await self.bot.config.set(key, value)
-            await self.bot.config.update()
-            embed = discord.Embed(
-                title="Success",
-                color=self.bot.main_color,
-                description=f"Set `{key}` to `{self.bot.config[key]}`.",
-            )
+            try:
+                await self.bot.config.set(key, value)
+                await self.bot.config.update()
+                embed = discord.Embed(
+                    title="Success",
+                    color=self.bot.main_color,
+                    description=f"Set `{key}` to `{self.bot.config[key]}`.",
+                )
+            except InvalidConfigError as exc:
+                embed = exc.embed
         else:
             embed = discord.Embed(
                 title="Error", color=self.bot.error_color, description=f"{key} is an invalid key."
@@ -40,6 +46,6 @@ class NeoPlugin(commands.Cog):
 
         await interaction.response.send_message(embed=embed)
 
-async def setup(bot: commands.Bot):
+async def setup(bot: ModmailBot):
     await bot.add_cog(NeoPlugin(bot))
     await bot.tree.sync()
