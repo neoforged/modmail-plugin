@@ -6,6 +6,8 @@ from discord.ext import commands
 
 from bot import ModmailBot
 from core.models import InvalidConfigError
+from core.thread import Thread
+
 
 class NeoPlugin(commands.Cog):
     config_group = app_commands.Group(name = "config", description="Config commands")
@@ -70,7 +72,10 @@ class NeoPlugin(commands.Cog):
                     description=self.reason.value
                 )
                 embed.add_field(name="Message", value=message.jump_url)
-                await thread.channel().send(embed=embed)
+                self.bot.loop.create_task(self.submit_report(int, thread, embed))
+
+            async def submit_report(self, int: discord.Interaction, thread: Thread, embed: discord.Embed):
+                await thread.channel.send(embed=embed)
                 await int.response.send_message('Your report has been submitted. Moderators will contact you via DMs received through this bot.', ephemeral=True)
 
         await interaction.response.send_modal(Form(self.bot))
