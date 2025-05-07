@@ -1,7 +1,7 @@
 from os import truncate
 
 import discord
-from discord import app_commands, TextStyle
+from discord import app_commands, TextStyle, AppCommandType
 from discord.ext import commands
 
 from bot import ModmailBot
@@ -12,6 +12,11 @@ class NeoPlugin(commands.Cog):
 
     def __init__(self, bot: ModmailBot):
         self.bot = bot
+
+        self.bot.tree.add_command(app_commands.ContextMenu(
+            name="Report",
+            callback=self.report
+        ))
 
     async def config_option_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         keys = sorted(self.bot.config.public_keys)
@@ -46,8 +51,6 @@ class NeoPlugin(commands.Cog):
 
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.guild_only
-    @app_commands.context_menu(name="Report")
     async def report(self, interaction: discord.Interaction, message: discord.Message):
         class Form(discord.ui.Modal, title='Submit report'):
             def __init__(self, bot: ModmailBot):
