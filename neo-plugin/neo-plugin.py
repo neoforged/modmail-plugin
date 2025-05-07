@@ -1,7 +1,7 @@
 from os import truncate
 
 import discord
-from discord import app_commands
+from discord import app_commands, TextStyle
 from discord.ext import commands
 
 from bot import ModmailBot
@@ -18,7 +18,7 @@ class NeoPlugin(commands.Cog):
         return [app_commands.Choice(name=option, value=option) for option in keys if
                 option.lower().startswith(current.lower())][:25]
 
-    @app_commands.guild_only()
+    @app_commands.guild_only
     @app_commands.describe(key="The config key", value="The config value")
     @app_commands.autocomplete(key=config_option_autocomplete)
     @app_commands.default_permissions(moderate_members=True)
@@ -45,6 +45,32 @@ class NeoPlugin(commands.Cog):
             embed.add_field(name="Valid keys", value=truncate(", ".join(valid_keys), 1024))
 
         await interaction.response.send_message(embed=embed)
+
+    @app_commands.guild_only
+    @app_commands.context_menu(name="Report")
+    async def report(self, interaction: discord.Interaction, message: discord.Message):
+        class Form(discord.ui.Modal, title='Submit report'):
+            def __init__(self, bot: ModmailBot):
+                super().__init__()
+                self.bot = bot
+
+            reason = discord.ui.TextInput(
+                label='Why are you reporting this message?',
+                style=TextStyle.paragraph,
+                placeholder='Type the reason for this report here...'
+            )
+
+            async def on_submit(self, interaction: discord.Interaction):
+                thread = await self.bot.threads.find_or_create(interaction.user)
+                embed = discord.Embed(
+                    title="Received report from user",
+                    description=self.reason.value
+                )
+                embed.add_field(name="Message", value=message.jump_url)
+                await thread.channel.send(embed=embed)
+                await interaction.response.send_message('Your report has been submitted. Moderators will contact you via DMs received through this bot.', ephemeral=True)
+
+        await interaction.response.send_modal(Form(self.bot))
 
 async def setup(bot: ModmailBot):
     await bot.add_cog(NeoPlugin(bot))
