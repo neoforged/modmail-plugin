@@ -1,7 +1,7 @@
 from os import truncate
 
 import discord
-from discord import app_commands, TextStyle, AppCommandType
+from discord import app_commands, TextStyle, AppCommandType, Permissions
 from discord.ext import commands
 
 from bot import ModmailBot
@@ -10,7 +10,7 @@ from core.thread import Thread
 
 
 class NeoPlugin(commands.Cog):
-    config_group = app_commands.Group(name = "config", description="Config commands")
+    config_group = app_commands.Group(name = "config", description="Config commands", default_permissions=Permissions(moderate_members=True))
 
     def __init__(self, bot: ModmailBot):
         self.bot = bot
@@ -28,7 +28,6 @@ class NeoPlugin(commands.Cog):
     @app_commands.guild_only
     @app_commands.describe(key="The config key", value="The config value")
     @app_commands.autocomplete(key=config_option_autocomplete)
-    @app_commands.default_permissions(moderate_members=True)
     @config_group.command(name="set", description="Set a config value")
     async def set_config(self, interaction: discord.Interaction, key: str, value: str) -> None:
         keys = self.bot.config.public_keys
