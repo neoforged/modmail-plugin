@@ -63,15 +63,15 @@ class NeoPlugin(commands.Cog):
                 placeholder='Type the reason for this report here...'
             )
 
-            async def on_submit(self, interaction: discord.Interaction):
+            async def on_submit(self, int: discord.Interaction):
                 thread = await self.bot.threads.find_or_create(interaction.user)
                 embed = discord.Embed(
                     title="Received report from user",
                     description=self.reason.value
                 )
                 embed.add_field(name="Message", value=message.jump_url)
-                await thread.channel.send(embed=embed)
-                await interaction.response.send_message('Your report has been submitted. Moderators will contact you via DMs received through this bot.', ephemeral=True)
+                await thread.channel().send(embed=embed)
+                await int.response.send_message('Your report has been submitted. Moderators will contact you via DMs received through this bot.', ephemeral=True)
 
         await interaction.response.send_modal(Form(self.bot))
 
