@@ -13,7 +13,7 @@ class NeoPlugin(commands.Cog):
     async def config_option_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         keys = self.bot.config.public_keys
         return [app_commands.Choice(name=option, value=option) for option in keys if
-                option.lower().startswith(current.lower())][:25]
+                option.lower().startswith(current.lower())].sort(key=lambda a : a.value)[:25]
 
     @app_commands.guild_only()
     @app_commands.describe(key="The config key", value="The config value")
