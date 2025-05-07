@@ -86,7 +86,7 @@ class NeoPlugin(commands.Cog):
     @app_commands.describe(message="The message to send")
     @app_commands.command(name="areply", description="Reply anonymously to the thread in this channel")
     async def areply(self, interaction: discord.Interaction, message: str) -> None:
-        thread = await self.threads.find(channel=interaction.channel)
+        thread = await self.bot.threads.find(channel=interaction.channel)
         if thread is not None:
             await thread.reply({
                 'channel': interaction.channel,
