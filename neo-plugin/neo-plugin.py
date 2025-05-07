@@ -88,10 +88,12 @@ class NeoPlugin(commands.Cog):
     async def areply(self, interaction: discord.Interaction, message: str) -> None:
         thread = await self.bot.threads.find(channel=interaction.channel)
         if thread is not None:
-            await thread.reply(message=DummyMessage({
-                'channel': interaction.channel,
-                'content': message,
-                'author': interaction.user
+            await thread.reply(message=DummyMessage(message={
+                "channel": interaction.channel,
+                "content": message,
+                "author": interaction.user,
+                "attachments": [],
+                "stickers": []
             }), anonymous=True, plain=False)
             await interaction.response.send_message('Message sent!')
         else:
