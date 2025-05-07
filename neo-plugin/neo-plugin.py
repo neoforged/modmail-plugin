@@ -94,6 +94,7 @@ class NeoPlugin(commands.Cog):
                 'attachments': [],
                 'stickers': []
             }, anonymous=True, plain=False)
+            await interaction.response.send_message('Message sent!')
         else:
             await interaction.response.send_message('You cannot use this command in this channel', ephemeral=True)
 
