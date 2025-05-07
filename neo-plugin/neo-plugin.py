@@ -5,16 +5,21 @@ from discord import app_commands
 from discord.ext import commands
 
 class NeoPlugin(commands.Cog):
+    config_group = app_commands.Group(name = "config", description="Config commands")
+
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        print(message.content)
+    async def config_option_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        keys = self.bot.config.public_keys
+        return [app_commands.Choice(name=option, value=option) for option in keys if
+                option.lower().startswith(current.lower())][:25]
 
-    @app_commands.command(name="set-config", description="Set config value")
+    @app_commands.guild_only()
     @app_commands.describe(key="The config key", value="The config value")
+    @app_commands.autocomplete(key=config_option_autocomplete)
     @app_commands.default_permissions(moderate_members=True)
+    @config_group.command(name="set", description="Set a config value")
     async def set_config(self, interaction: discord.Interaction, key: str, value: str) -> None:
         keys = self.bot.config.public_keys
 
