@@ -82,6 +82,21 @@ class NeoPlugin(commands.Cog):
 
         await interaction.response.send_modal(Form(self.bot))
 
+    @app_commands.guild_only
+    @app_commands.describe(message="The message to send")
+    @app_commands.command(name="areply", description="Reply anonymously to the thread in this channel")
+    async def areply(self, interaction: discord.Interaction, message: str) -> None:
+        thread = await self.threads.find(channel=interaction.channel)
+        if thread is not None:
+            await thread.reply({
+                'channel': interaction.channel,
+                'content': message,
+                'attachments': [],
+                'stickers': []
+            }, anonymous=True, plain=False)
+        else:
+            await interaction.response.send_message('You cannot use this command in this channel', ephemeral=True)
+
 async def setup(bot: ModmailBot):
     await bot.add_cog(NeoPlugin(bot))
     await bot.tree.sync()
